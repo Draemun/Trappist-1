@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -323,6 +324,7 @@
         .app-ranks .app-icon { background: linear-gradient(145deg, #4facfe, #00f2fe); }
         .app-timeline .app-icon { background: linear-gradient(145deg, #43e97b, #38f9d7); }
         .app-runway .app-icon { background: linear-gradient(145deg, #fa709a, #fee140); }
+        .app-storyposts .app-icon { background: linear-gradient(145deg, #ffecd2, #fcb69f); }
         .app-characters .app-icon { background: linear-gradient(145deg, #a8edea, #fed6e3); }
         .app-settings .app-icon { background: linear-gradient(145deg, #667eea, #764ba2); }
 
@@ -837,6 +839,11 @@
                     <div class="app app-runway" onclick="openApp('runway')">
                         <div class="app-icon">⚡</div>
                         <div class="app-label">Runway</div>
+                    </div>
+
+                    <div class="app app-storyposts" onclick="openApp('storyposts')">
+                        <div class="app-icon">📜</div>
+                        <div class="app-label">Story Posts</div>
                     </div>
 
                     <div class="app app-characters" onclick="openApp('characters')">
@@ -1573,6 +1580,105 @@
                 </div>
             </div>
 
+            <div id="storypostsApp" class="app-content">
+                <div class="app-header">
+                    <button class="back-btn" onclick="closeApp()">←</button>
+                    <div class="app-title">Story Posts</div>
+                </div>
+                <div class="content-area">
+                    <div class="input-group">
+                        <input type="text" class="input-field" id="storypostSearch" placeholder="Search by character name..." oninput="filterStoryposts()">
+                    </div>
+                    <div class="character-list" id="storypostList">
+                        <div class="character-item" data-character="luna arvada">
+                            <div class="character-name">There's no clock</div>
+                            <div>Luna</div>
+                            <div><a href="https://docs.google.com/document/d/1_eUAZQBGYS_X660EvPhILRRWGTplU-Q5x7mw_8RxlKc/edit" class="planet-link" target="_blank">Link</a></div>
+                        </div>
+                        <div class="character-item" data-character="silver draemun">
+                            <div class="character-name">The red plague</div>
+                            <div>Silver</div>
+                            <div><a href="https://docs.google.com/document/d/1Cc9OP-MDIdpzJw8_o3Foq8Gq4EN9cNwJPCT2BpgBgvs/edit?usp=drivesdk" class="planet-link" target="_blank">Link</a></div>
+                        </div>
+                        <div class="character-item" data-character="silver draemun">
+                            <div class="character-name">Black Hollow</div>
+                            <div>Silver</div>
+                            <div><a href="https://docs.google.com/document/d/1inzpEbXetqXy-3RtBCliX7dMvL5Hvi1AQTsW2YvArDU/edit?usp=sharing" class="planet-link" target="_blank">Link</a></div>
+                        </div>
+                        <div class="character-item" data-character="sypheron valtros">
+                            <div class="character-name">Does it count as 'bad day'?</div>
+                            <div>Sypheron</div>
+                            <div><a href="https://docs.google.com/document/d/1dS5wITmsWg58UKwHot20wKWm9idwtPMT3M0rJ3KvBrs/edit?usp=sharing" class="planet-link" target="_blank">Link</a></div>
+                        </div>
+                        <div class="character-item" data-character="whittney mayworth">
+                            <div class="character-name">The Happiest Days of Our Lives</div>
+                            <div>Mayworth</div>
+                            <div><a href="https://docs.google.com/document/d/1hUSR6D5IZV45HK0_LnuQ2wS1pf7CBAY_60GoWdW2cM0/edit" class="planet-link" target="_blank">Link</a></div>
+                        </div>
+                        <div class="character-item" data-character="silver draemun">
+                            <div class="character-name">THERAPY?! IN THIS ECONOMY?!</div>
+                            <div>Silver</div>
+                            <div><a href="https://docs.google.com/document/d/1nGqM93fVaRt5UeDIeiLkS9psvPeyJYA_sryaUjDmGQ0/edit?usp=sharing" class="planet-link" target="_blank">Link</a></div>
+                        </div>
+                        <div class="character-item" data-character="sypheron valtros">
+                            <div class="character-name">Valtros is such a peculiar surname...</div>
+                            <div>Sypheron</div>
+                            <div><a href="https://docs.google.com/document/d/1j_4VIarQAqBxlWT30nTwYtI-7sjsUIOUmAJiT-hUyTU/edit?usp=sharing" class="planet-link" target="_blank">Link</a></div>
+                        </div>
+                        <div class="character-item" data-character="leviathan maeric">
+                            <div class="character-name">I'd burn the stars for you.</div>
+                            <div>Leviathan</div>
+                            <div><a href="https://docs.google.com/document/d/180vvopBmReTdmP3cRKpLzg87BMiWMaqW0COBelUi4GY/edit?usp=sharing" class="planet-link" target="_blank">Link</a></div>
+                        </div>
+                        <div class="character-item" data-character="whittney mayworth">
+                            <div class="character-name">My Love, My Light, My Demise</div>
+                            <div>Mayworth</div>
+                            <div><a href="https://docs.google.com/document/d/1I1IidDG4X2a8EacGijGwt8ipXGmW5rPcL17tSHBlqnk/edit?usp=sharing" class="planet-link" target="_blank">Link</a></div>
+                        </div>
+                        <div class="character-item" data-character="zeke verion">
+                            <div class="character-name">Please do not the engineer</div>
+                            <div>Zeke</div>
+                            <div><a href="https://docs.google.com/document/d/1stNCKoPcVCWxIberhTKJL7X5FzVZQD7VnKXU7zANcLY/edit?usp=sharing" class="planet-link" target="_blank">Link</a></div>
+                        </div>
+                        <div class="character-item" data-character="sypheron valtros">
+                            <div class="character-name">"Long day?" "Nah."</div>
+                            <div>Sypheron</div>
+                            <div><a href="https://docs.google.com/document/d/1S2gwLZ1lbRdcjYRXnK82FJIhMDnNmgZA50BOYD6REto/edit?usp=sharing" class="planet-link" target="_blank">Link</a></div>
+                        </div>
+                        <div class="character-item" data-character="whittney mayworth">
+                            <div class="character-name">Firecracker</div>
+                            <div>Mayworth</div>
+                            <div><a href="https://docs.google.com/document/d/18IAyGBhaGbzx5iD8vTTYz2LLIw0Uq1LDQkH63Q3Ojls/edit?usp=sharing" class="planet-link" target="_blank">Link</a></div>
+                        </div>
+                        <div class="character-item" data-character="apollo valtros">
+                            <div class="character-name">A WHOLESOME POST?? IN THIS ECONOMY!!??</div>
+                            <div>Apollo</div>
+                            <div><a href="https://docs.google.com/document/d/121aR9EL6U8UP1d1PEqnOqmktYyal8WAYX-EE79LSoKI/edit?usp=sharing" class="planet-link" target="_blank">Link</a></div>
+                        </div>
+                        <div class="character-item" data-character="sypheron valtros">
+                            <div class="character-name">Snowstorm</div>
+                            <div>Sypheron</div>
+                            <div><a href="https://docs.google.com/document/d/1B5HyGqV1k6xueoKemT9SIxrS4zZnZ9qf-fN1MWfFbzU/edit?usp=sharing" class="planet-link" target="_blank">Link</a></div>
+                        </div>
+                        <div class="character-item" data-character="misc">
+                            <div class="character-name">TRAPPIST-1 Shorts</div>
+                            <div>Misc</div>
+                            <div><a href="https://docs.google.com/document/d/1dQhQVrf5qLrwi3OwGogSwGD3rsSyaBRwE3senqL9Z84/edit?usp=sharing" class="planet-link" target="_blank">Link</a></div>
+                        </div>
+                        <div class="character-item" data-character="apollo valtros">
+                            <div class="character-name">The Past? How Hilarious Darling.</div>
+                            <div>Apollo</div>
+                            <div><a href="https://docs.google.com/document/d/1fwKSm7lyCLJCXDvkkEvX09oLVs4HVy0C-Zt0WkeOtKk/edit?usp=sharing" class="planet-link" target="_blank">Link</a></div>
+                        </div>
+                        <div class="character-item" data-character="steve tharyn">
+                            <div class="character-name">Try to make a simple NPC challenge (Impossible)</div>
+                            <div>Steve</div>
+                            <div><a href="https://docs.google.com/document/d/11-7CU7rXbcZcHlpAhzTChu3GVM7AZTsKDX_7CQQq99A/edit?tab=t.0" class="planet-link" target="_blank">Link</a></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div id="charactersApp" class="app-content">
                 <div class="app-header">
                     <button class="back-btn" onclick="closeApp()">←</button>
@@ -1713,9 +1819,23 @@
 
 
 
+        function filterStoryposts() {
+            const searchTerm = document.getElementById('storypostSearch').value.toLowerCase();
+            const storyposts = document.querySelectorAll('#storypostList .character-item');
+            
+            storyposts.forEach(storypost => {
+                const character = storypost.getAttribute('data-character');
+                if (character.includes(searchTerm)) {
+                    storypost.style.display = 'block';
+                } else {
+                    storypost.style.display = 'none';
+                }
+            });
+        }
+
         function filterCharacters() {
             const searchTerm = document.getElementById('characterSearch').value.toLowerCase();
-            const characters = document.querySelectorAll('.character-item');
+            const characters = document.querySelectorAll('#characterList .character-item');
             
             characters.forEach(character => {
                 const name = character.getAttribute('data-name');
@@ -1773,7 +1893,7 @@
             if (e.key === 'Enter') login();
         });
 
-        // Update time and galactic date
+        // Update time, galactic date and battery
         function updateTime() {
             const now = new Date();
             const timeStr = now.toLocaleTimeString('en-US', { 
@@ -1789,6 +1909,17 @@
             const day = String(now.getDate()).padStart(2, '0');
             const galacticDate = `${galacticYear}.${month}.${day}`;
             document.getElementById('galacticTime').textContent = `Galactic Standard Time: ${galacticDate}`;
+            
+            // Update battery level
+            if ('getBattery' in navigator) {
+                navigator.getBattery().then(battery => {
+                    const batteryLevel = Math.round(battery.level * 100);
+                    const batteryFill = document.querySelector('.battery-fill');
+                    if (batteryFill) {
+                        batteryFill.style.width = batteryLevel + '%';
+                    }
+                });
+            }
         }
 
         // Planet collapsible functionality
