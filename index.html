@@ -1,0 +1,1804 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Echonet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 50%, #16213e 100%);
+            --bg-secondary: linear-gradient(135deg, #0a0a0a 0%, #1a1a2e 100%);
+            --text-primary: #e0e6ed;
+            --text-accent: #00ffff;
+            --text-secondary: #00ffff;
+            --card-bg: rgba(255, 255, 255, 0.1);
+            --border-color: rgba(0, 255, 255, 0.15);
+            --input-bg: rgba(0, 0, 0, 0.3);
+        }
+
+        [data-theme="light"] {
+            --bg-primary: linear-gradient(135deg, #f0f0f0 0%, #e0e0e0 50%, #d0d0d0 100%);
+            --bg-secondary: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+            --text-primary: #2c2c2c;
+            --text-accent: #0066cc;
+            --text-secondary: #0066cc;
+            --card-bg: rgba(0, 0, 0, 0.05);
+            --border-color: rgba(0, 102, 204, 0.15);
+            --input-bg: rgba(255, 255, 255, 0.8);
+        }
+
+        [data-theme="high-contrast"] {
+            --bg-primary: linear-gradient(135deg, #000000 0%, #000000 100%);
+            --bg-secondary: linear-gradient(135deg, #000000 0%, #000000 100%);
+            --text-primary: #ffffff;
+            --text-accent: #ffff00;
+            --text-secondary: #ffff00;
+            --card-bg: rgba(255, 255, 255, 0.2);
+            --border-color: rgba(255, 255, 0, 0.4);
+            --input-bg: rgba(255, 255, 255, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Orbitron', monospace;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .stars {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .star {
+            position: absolute;
+            background: #fff;
+            border-radius: 50%;
+            animation: twinkle 3s infinite alternate;
+        }
+
+        @keyframes twinkle {
+            0% { opacity: 0.3; }
+            100% { opacity: 1; }
+        }
+
+        .tablet-container {
+            width: 900px;
+            height: 650px;
+            background: linear-gradient(145deg, #0a0a0a, #1a1a1a);
+            border-radius: 25px;
+            padding: 15px;
+            box-shadow: 
+                0 0 50px rgba(0, 255, 255, 0.5),
+                0 0 100px rgba(0, 255, 255, 0.2),
+                inset 0 2px 10px rgba(0, 255, 255, 0.1);
+            position: relative;
+            overflow: hidden;
+            border: 2px solid rgba(0, 255, 255, 0.3);
+        }
+        
+        .tablet-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: repeating-linear-gradient(
+                90deg,
+                transparent,
+                transparent 2px,
+                rgba(0, 255, 255, 0.03) 2px,
+                rgba(0, 255, 255, 0.03) 4px
+            );
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            background: var(--bg-secondary);
+            border-radius: 30px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+            box-shadow: inset 0 0 20px rgba(0, 255, 255, 0.1);
+        }
+
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 20px 10px;
+            color: #00ffff;
+            font-size: 0.8rem;
+            font-weight: 700;
+        }
+
+        .time {
+            color: var(--text-accent);
+        }
+
+        .battery-signal {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .signal-bars {
+            display: flex;
+            gap: 2px;
+        }
+
+        .bar {
+            width: 3px;
+            background: var(--text-accent);
+            border-radius: 1px;
+        }
+
+        .bar:nth-child(1) { height: 4px; }
+        .bar:nth-child(2) { height: 6px; }
+        .bar:nth-child(3) { height: 8px; }
+        .bar:nth-child(4) { height: 10px; }
+
+        .battery {
+            width: 20px;
+            height: 10px;
+            border: 1px solid var(--text-accent);
+            border-radius: 2px;
+            position: relative;
+        }
+
+        .battery::after {
+            content: '';
+            position: absolute;
+            right: -3px;
+            top: 3px;
+            width: 2px;
+            height: 4px;
+            background: var(--text-accent);
+            border-radius: 0 1px 1px 0;
+        }
+
+        .battery-fill {
+            width: 80%;
+            height: 100%;
+            background: var(--text-accent);
+            border-radius: 1px;
+        }
+
+        .home-screen {
+            padding: 20px;
+            height: calc(100% - 60px);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .wallpaper {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 70%, rgba(0, 255, 255, 0.1) 0%, transparent 50%);
+            pointer-events: none;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            z-index: 10;
+            position: relative;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--text-accent);
+            text-shadow: 
+                0 0 20px var(--text-accent),
+                0 0 40px var(--text-accent),
+                0 0 60px var(--text-accent);
+            margin-bottom: 5px;
+            animation: pulse-glow 2s ease-in-out infinite alternate;
+        }
+        
+        @keyframes pulse-glow {
+            from { text-shadow: 0 0 20px var(--text-accent), 0 0 40px var(--text-accent), 0 0 60px var(--text-accent); }
+            to { text-shadow: 0 0 30px var(--text-accent), 0 0 50px var(--text-accent), 0 0 70px var(--text-accent); }
+        }
+        
+        .planet-content p {
+            margin-bottom: 15px;
+            line-height: 1.8;
+        }
+        
+        .planet-content strong {
+            color: var(--text-accent);
+        }
+
+        .header p {
+            font-size: 0.8rem;
+            opacity: 0.8;
+            color: var(--text-secondary);
+        }
+
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 30px;
+            flex-grow: 1;
+            align-content: start;
+            z-index: 10;
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .app {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 10px;
+            border-radius: 20px;
+        }
+
+        .app:hover {
+            transform: scale(1.1);
+            background: var(--border-color);
+        }
+
+        .app-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            position: relative;
+            box-shadow: 
+                0 8px 25px rgba(0, 0, 0, 0.4),
+                0 0 20px rgba(0, 255, 255, 0.2),
+                inset 0 1px 0 rgba(255, 255, 255, 0.1);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(0, 255, 255, 0.3);
+        }
+
+        .app:hover .app-icon {
+            box-shadow: 
+                0 12px 35px var(--border-color),
+                0 0 30px rgba(0, 255, 255, 0.4),
+                inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .app-label {
+            font-size: 0.7rem;
+            text-align: center;
+            font-weight: 700;
+            opacity: 0.9;
+        }
+
+        .app-notification {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: #00ffff;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.6rem;
+            font-weight: 700;
+        }
+
+        /* App-specific colors and icons */
+        .app-lore .app-icon { background: linear-gradient(145deg, #ff6b6b, #ff8e53); }
+        .app-planets .app-icon { background: linear-gradient(145deg, #4ecdc4, #44a08d); }
+        .app-racing .app-icon { background: linear-gradient(145deg, #f093fb, #f5576c); }
+        .app-ranks .app-icon { background: linear-gradient(145deg, #4facfe, #00f2fe); }
+        .app-timeline .app-icon { background: linear-gradient(145deg, #43e97b, #38f9d7); }
+        .app-runway .app-icon { background: linear-gradient(145deg, #fa709a, #fee140); }
+        .app-characters .app-icon { background: linear-gradient(145deg, #a8edea, #fed6e3); }
+        .app-settings .app-icon { background: linear-gradient(145deg, #667eea, #764ba2); }
+
+        .dock {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px 0 10px;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            margin-top: auto;
+            border: 1px solid rgba(0, 255, 255, 0.2);
+        }
+
+        .dock-app {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+        }
+
+        .dock-app:hover {
+            transform: scale(1.2) translateY(-5px);
+            box-shadow: 0 10px 25px var(--border-color);
+        }
+
+        .app-content {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-secondary);
+            border-radius: 25px;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            padding: 60px 30px 30px;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .app-content.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .app-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .back-btn {
+            background: none;
+            border: none;
+            color: var(--text-accent);
+            font-size: 1.5rem;
+            cursor: pointer;
+            margin-right: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            transform: scale(1.2);
+            text-shadow: 0 0 10px var(--text-accent);
+        }
+
+        .app-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-accent);
+        }
+
+        .content-area {
+            color: var(--text-primary);
+            line-height: 1.6;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border-color);
+            box-shadow: 
+                0 4px 15px rgba(0, 0, 0, 0.3),
+                0 0 10px rgba(0, 255, 255, 0.1),
+                inset 0 1px 0 rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.5), transparent);
+        }
+
+        .card h3 {
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .planet-grid {
+            display: grid;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .character-list {
+            display: grid;
+            gap: 15px;
+        }
+
+        .character-item {
+            background: var(--card-bg);
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid var(--text-accent);
+        }
+
+        .character-name {
+            color: var(--text-secondary);
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+
+        .rank-section {
+            margin-bottom: 30px;
+        }
+
+        .rank-section h3 {
+            color: var(--text-accent);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+            text-align: center;
+        }
+
+        .rank-list {
+            display: grid;
+            gap: 8px;
+        }
+
+        .rank-item {
+            background: var(--card-bg);
+            padding: 12px;
+            border-radius: 8px;
+            border-left: 3px solid var(--text-accent);
+            font-size: 0.9rem;
+        }
+
+        .criminal-rank {
+            border-left-color: #ff6b6b;
+        }
+
+        .input-group {
+            margin-bottom: 15px;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid var(--text-accent);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+        }
+
+        .textarea-field {
+            width: 100%;
+            min-height: 100px;
+            padding: 12px;
+            background: var(--input-bg);
+            border: 1px solid var(--text-accent);
+            border-radius: 8px;
+            color: var(--text-primary);
+            font-family: 'Orbitron', monospace;
+            font-size: 0.9rem;
+            resize: vertical;
+        }
+
+        .theme-selector {
+            display: grid;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .theme-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .theme-option:hover {
+            background: var(--border-color);
+        }
+
+        .theme-option.active {
+            border-color: var(--text-accent);
+            background: var(--border-color);
+        }
+
+        .theme-radio {
+            width: 16px;
+            height: 16px;
+            border: 2px solid var(--text-accent);
+            border-radius: 50%;
+            position: relative;
+        }
+
+        .theme-option.active .theme-radio::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 8px;
+            height: 8px;
+            background: var(--text-accent);
+            border-radius: 50%;
+        }
+
+        .planet-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.85rem;
+        }
+
+        .planet-table th,
+        .planet-table td {
+            padding: 8px 12px;
+            text-align: left;
+            border: 1px solid var(--border-color);
+        }
+
+        .planet-table th {
+            background: rgba(0, 255, 255, 0.3);
+            color: var(--text-primary);
+            font-weight: 700;
+            text-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+            border-bottom: 2px solid rgba(0, 255, 255, 0.5);
+        }
+
+        [data-theme="light"] .planet-table th {
+            background: rgba(0, 102, 204, 0.3);
+        }
+
+        [data-theme="high-contrast"] .planet-table th {
+            background: rgba(255, 255, 0, 0.3);
+        }
+
+        .planet-header {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .planet-header:hover {
+            opacity: 0.8;
+        }
+
+        .collapse-icon {
+            font-size: 0.8rem;
+            transition: transform 0.3s ease;
+        }
+
+        .collapsed .collapse-icon {
+            transform: rotate(-90deg);
+        }
+
+        .planet-content {
+            max-height: none;
+            overflow: visible;
+            transition: all 0.5s ease;
+            opacity: 1;
+        }
+
+        .collapsed .planet-content {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+        }
+
+        .planet-table td {
+            background: var(--card-bg);
+            border-bottom: 1px solid rgba(0, 255, 255, 0.1);
+        }
+
+        .planet-link {
+            color: var(--text-accent);
+            text-decoration: none;
+            font-weight: 700;
+        }
+
+        .planet-link:hover {
+            text-decoration: underline;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #00ffff, #4ecdc4);
+            color: #000;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 20px;
+            font-family: 'Orbitron', monospace;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-size: 0.9rem;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 8px 20px rgba(0, 255, 255, 0.3);
+        }
+
+        @media (max-width: 950px) {
+            .tablet-container {
+                width: 95vw;
+                height: 90vh;
+                border-radius: 20px;
+            }
+            .app-grid {
+                grid-template-columns: repeat(4, 1fr);
+                gap: 20px;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .tablet-container {
+                width: 98vw;
+                height: 95vh;
+            }
+            .app-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 15px;
+            }
+            .app-icon {
+                width: 60px;
+                height: 60px;
+                font-size: 1.8rem;
+            }
+        }
+
+        .login-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: var(--bg-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+        }
+
+        .login-box {
+            background: var(--bg-secondary);
+            border: 1px solid #00ffff;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+            text-align: center;
+            min-width: 300px;
+        }
+
+        .login-box h2 {
+            color: #00ffff;
+            margin-bottom: 20px;
+            text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+        }
+
+        .login-form .input-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        .login-form label {
+            display: block;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .login-form input {
+            width: 100%;
+            padding: 8px;
+            background: var(--bg-primary);
+            border: 1px solid #00ffff;
+            border-radius: 4px;
+            color: var(--text-primary);
+            box-sizing: border-box;
+        }
+
+        .login-form input:focus {
+            outline: none;
+            box-shadow: 0 0 5px rgba(0, 255, 255, 0.5);
+        }
+
+        .login-box button {
+            width: 100%;
+            padding: 10px;
+            background: #00ffff;
+            color: #000;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .login-box button:hover {
+            background: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <h2>ECHONET OS</h2>
+            <div class="login-form">
+                <div class="input-group">
+                    <label>Username:</label>
+                    <input type="text" value="Admin" readonly>
+                </div>
+                <div class="input-group">
+                    <label>Password:</label>
+                    <input type="password" id="password" placeholder="Enter password">
+                </div>
+                <button onclick="login()">LOGIN</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="stars" id="stars"></div>
+    
+    <div class="tablet-container" id="mainInterface" style="display: none;">
+        <div class="screen">
+            <div class="wallpaper"></div>
+            
+            <div class="status-bar">
+                <div class="time">15:42</div>
+                <div class="battery-signal">
+                    <div class="signal-bars">
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                        <div class="bar"></div>
+                    </div>
+                    <div class="battery">
+                        <div class="battery-fill"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="home-screen" id="homeScreen">
+                <div class="header">
+                    <h1>Echonet OS</h1>
+                    <p id="galacticTime">Galactic Standard Time: 2239.08.31</p>
+                </div>
+
+                <div class="app-grid">
+                    <div class="app app-lore" onclick="openApp('lore')">
+                        <div class="app-icon">🌐</div>
+                        <div class="app-label">Lore</div>
+                    </div>
+
+                    <div class="app app-planets" onclick="openApp('planets')">
+                        <div class="app-icon">🪐</div>
+                        <div class="app-label">Planets</div>
+                    </div>
+
+
+
+                    <div class="app app-ranks" onclick="openApp('ranks')">
+                        <div class="app-icon">⭐</div>
+                        <div class="app-label">Ranks</div>
+                    </div>
+
+                    <div class="app app-timeline" onclick="openApp('timeline')">
+                        <div class="app-icon">⏳</div>
+                        <div class="app-label">Timeline</div>
+                    </div>
+
+                    <div class="app app-runway" onclick="openApp('runway')">
+                        <div class="app-icon">⚡</div>
+                        <div class="app-label">Runway</div>
+                    </div>
+
+                    <div class="app app-characters" onclick="openApp('characters')">
+                        <div class="app-icon">👥</div>
+                        <div class="app-label">Characters</div>
+                    </div>
+
+                    <div class="app app-settings" onclick="openApp('settings')">
+                        <div class="app-icon">⚙️</div>
+                        <div class="app-label">Settings</div>
+                    </div>
+                </div>
+
+                <div class="dock">
+                    <div class="dock-app" onclick="openApp('characters')">🏠</div>
+                    <div class="dock-app" onclick="openApp('runway')">💬</div>
+                    <div class="dock-app" onclick="openApp('ranks')">📡</div>
+                </div>
+            </div>
+
+            <div id="loreApp" class="app-content">
+                <div class="app-header">
+                    <button class="back-btn" onclick="closeApp()">←</button>
+                    <div class="app-title">System Archives</div>
+                </div>
+                <div class="content-area">
+                    <div class="card">
+                        <h3>LOG.1 - THE SYSTEM</h3>
+                        <p>The TRAPPIST-1 system is located at RA 23h 6m 29s; Dec -5° 2′ 29″, within the constellation Aquarius. It is 40.66 light years away from Earth. Within the system there are 7 planets, labeled TRAPPIST-1b/h, all of which orbit around TRAPPIST-1a.</p>
+                        <p>The passage of time is localized via 24 hour cycles. This ensures that the human sleep cycle is kept intact. Surrounding each planet is a mothership, labeled Vexis-1/7, the functioning capital of each planet until each planet is successfully colonized.</p>
+                    </div>
+                    <div class="card">
+                        <h3>LOG.2 - Project Astrexus</h3>
+                        <p><strong>Date:</strong> 2104<br>
+                        <strong>Head of Project:</strong> Siderus Corp.<br>
+                        <strong>Head Engineer:</strong> Elliot Vexis</p>
+                        <p><strong>GOAL:</strong> Find and Colonize habitable planets to preserve human kind.</p>
+                    </div>
+                    <div class="card">
+                        <h3>LOG.2.1 - Construction</h3>
+                        <p>Led by head engineer Vexis, construction has been a smooth process. 7 freighter ships are to be constructed, allowing for one to orbit each planet in the TRAPPIST-1 system.</p>
+                        <p><strong>Ship Frame:</strong> All ships are created with a Titanium frame; lightweight and durable. Each unit is fabricated with a LRU - Large Rotational Unit. This allows for the simulation of gravity on each ship. The cockpit, engine bay, and artillery units are not included within the LRU.</p>
+                        <p><strong>Cockpit:</strong> The cockpit of each unit is equipped with the following: Guidance System, powered by the Uraxis AI; the main display console, a direct communications device, and all devices needed to control the internal safety of the Vexis units.</p>
+                        <p>The first batch of ships will be named after the head engineer.</p>
+                    </div>
+                    <div class="card">
+                        <h3>LOG.2.3 - Fuel</h3>
+                        <p>Each Vexis unit is powered by The Core. They are massive nuclear reactors that power the ships. Located within the engine bay, they are not affected by the artificial gravity of the LRU.</p>
+                        <p>It is rated to run smoothly with a ship population around 1.36 billion on the biggest ships. Exceeding this limit can cause the power grid to malfunction. In this event, the Uraxis AI is programmed to reroute the energy to ship function necessities.</p>
+                    </div>
+                    <div class="card">
+                        <h3>LOG.2.4 - Life within Vexis</h3>
+                        <p>The Vexis units are built with the intent to home millions of people. With this in mind, this is where certain ships differ from each other. Every ship is self sustainable to a degree, but they are built to benefit from each other.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Vexis Fleet Specifications</h3>
+                        <p><strong>Vexis-1:</strong> Created to orbit around TRAPPIST-1b, this ship is intended for engineers and electrical workers. The ship is equipped to keep these workers in good condition. It is not luxurious by any means, but good enough to live there for an extended period of time.</p>
+                        <p><strong>Vexis-2:</strong> Created to orbit around TRAPPIST-1c, this ship is the smallest of the project. TRAPPIST-1c shows promise of useful minerals underneath its surface. This ship is equipped to support a working class, with not many amenities. However, due to its smaller size, it is one of the quicker and more maneuverable ships.</p>
+                        <p><strong>Vexis-3, 4, & 5:</strong> Created to orbit around TRAPPIST-1d, e, and f respectively, these are the biggest ships of the fleet. They are designed to mimic modern cities on Earth. Prioritizing human comfort, each ship has a side designation.</p>
+                    </div>
+                    <div class="card">
+                        <h3>Specialized Vexis Units</h3>
+                        <p><strong>Vexis-3:</strong> Specializes in manufactured goods, with a decent sized research department. Its docking station is dedicated to trade, and it is a central point to get resources from one ship to another.</p>
+                        <p><strong>Vexis-4:</strong> Specializes in research and scientific innovation. It has a smaller docking station, but still sizable enough to fit many ships.</p>
+                        <p><strong>Vexis-5:</strong> Specializes in agriculture. Its docking station is intended for bigger transport ships, as to get food and other resources to the other ships.</p>
+                        <p><strong>Vexis-6:</strong> The harshest ship out of all. At the time of liftoff, it is currently only inhabited by law enforcement. This ship will be used to house prisoners of the other ships as the journey to TRAPPIST-1 commences. When all the ships settle into orbit, Vexis-6 is set to orbit around TRAPPIST-1g. This planet will be used to hold prisoners, and the ship is set to be the head of judicial operations.</p>
+                        <p><strong>Vexis-7:</strong> Created to orbit around TRAPPIST-1h, this ship was created with one word in mind: Luxury. The ship was to house the higher ups of society, and mainly those working at Siderus Corporation. Not much else is known about the internals of the ship.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="planetsApp" class="app-content">
+                <div class="app-header">
+                    <button class="back-btn" onclick="closeApp()">←</button>
+                    <div class="app-title">Planetary Database</div>
+                </div>
+                <div class="content-area">
+                    <div class="card collapsed">
+                        <h3 class="planet-header" onclick="togglePlanet(this)">
+                            <span class="collapse-icon">▼</span>
+                            Novertus | TRAPPIST-1a
+                        </h3>
+                        <div class="planet-content">
+                            <p><em>The Red Dwarf</em></p>
+                            <p>The central star of the TRAPPIST-1 system, providing energy to all seven orbiting worlds.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="card collapsed">
+                        <h3 class="planet-header" onclick="togglePlanet(this)">
+                            <span class="collapse-icon">▼</span>
+                            Vyrion | TRAPPIST-1b
+                        </h3>
+                        <div class="planet-content">
+                            <p><em>The Irradiated Planet</em></p>
+                            <p>"A scorched desert world harnessed for energy, not life."</p>
+                            
+                            <h4>Planetary Overview</h4>
+                            <table class="planet-table">
+                                <tr><th>Location</th><td>TRAPPIST-1b</td></tr>
+                                <tr><th>Type</th><td>Desert World</td></tr>
+                                <tr><th>Primary Features</th><td>Scorching, barren landscape with violent solar storms</td></tr>
+                                <tr><th>Climate</th><td>Eternal day on the sun-facing side, eternal night on the opposite side; deadly surface temperatures and constant radiation storms</td></tr>
+                                <tr><th>Atmosphere</th><td>Non-existent due to solar radiation storms</td></tr>
+                            </table>
+                            
+                            <h4>Geography & Landmarks</h4>
+                            <table class="planet-table">
+                                <tr><th>Day Side</th><td>Scorched wasteland with vast networks of solar panels</td></tr>
+                                <tr><th>Night Side</th><td>Frozen plains devoid of activity</td></tr>
+                                <tr><th>Key Landmarks</th><td>Solar Panel Arrays</td></tr>
+                            </table>
+                            
+                            <h4>Flora & Fauna</h4>
+                            <table class="planet-table">
+                                <tr><th>Flora</th><td>N/A</td></tr>
+                                <tr><th>Fauna</th><td>N/A</td></tr>
+                            </table>
+                            
+                            <h4>Civilization</h4>
+                            <table class="planet-table">
+                                <tr><th>Population</th><td>None permanently; visited only by maintenance crews</td></tr>
+                                <tr><th>Dominant Groups</th><td>Engineers and technicians from Vexis-1</td></tr>
+                                <tr><th>Technology Level</th><td>Highly advanced energy harnessing systems and protective gear for maintenance crews</td></tr>
+                                <tr><th>Society</th><td>No societal structures exist on the planet itself; operations are overseen by the Siderus Corporation from Vexis-1</td></tr>
+                            </table>
+                            
+                            <h4>Economy & Resources</h4>
+                            <table class="planet-table">
+                                <tr><th>Natural Resources</th><td>Solar energy harvested via massive panel arrays on the day side</td></tr>
+                                <tr><th>Economic Activity</th><td>Energy production and distribution to the colonies via freighter ships</td></tr>
+                            </table>
+                            
+                            <h4>Threats</h4>
+                            <table class="planet-table">
+                                <tr><th>Environmental Hazards</th><td>Solar radiation storms</td></tr>
+                                <tr><th></th><td>Extreme heat on the day side and freezing cold on the night side</td></tr>
+                                <tr><th></th><td>Lack of atmosphere making exposure lethal</td></tr>
+                                <tr><th>Other Threats</th><td>Technical malfunctions during maintenance could be catastrophic</td></tr>
+                            </table>
+                            
+                            <h4>Associated Ship: Vexis-1</h4>
+                            <table class="planet-table">
+                                <tr><th>Purpose</th><td>Orbiting facility to house engineers and workers managing Vyrion's solar operations</td></tr>
+                                <tr><th>Design</th><td>Compact, functional design to support a small workforce</td></tr>
+                                <tr><th></th><td>Equipped with a sizeable docking bay to manage constant freighter traffic</td></tr>
+                                <tr><th>Control</th><td>Operated by the Siderus Corporation</td></tr>
+                                <tr><th>Living Conditions</th><td>Basic and utilitarian; sufficient for extended stays</td></tr>
+                                <tr><th></th><td>Minimal crime due to the work-focused environment</td></tr>
+                                <tr><th>Link</th><td><a href="https://discord.com/channels/1317616738719895602/1326716720592978002" class="planet-link" target="_blank">Thread</a></td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="card collapsed">
+                        <h3 class="planet-header" onclick="togglePlanet(this)">
+                            <span class="collapse-icon">▼</span>
+                            Calyra-7 | TRAPPIST-1c
+                        </h3>
+                        <div class="planet-content">
+                            <p>"A blazing furnace of radioactive wealth beneath a barren surface."</p>
+                            
+                            <h4>Planetary Overview</h4>
+                            <table class="planet-table">
+                                <tr><th>Location</th><td>TRAPPIST-1c</td></tr>
+                                <tr><th>Type</th><td>Volcanic, Radioactive World</td></tr>
+                                <tr><th>Primary Features</th><td>Intense geological activity, extreme heat, and high levels of radioactivity</td></tr>
+                                <tr><th>Climate</th><td>Perpetual heat; temperatures average 60°C on "cold" days</td></tr>
+                                <tr><th>Atmosphere</th><td>Thin and inhospitable</td></tr>
+                            </table>
+                            
+                            <h4>Geography & Landmarks</h4>
+                            <table class="planet-table">
+                                <tr><th>Surface</th><td>Mostly barren, dotted with small craters; uninhabitable due to extreme heat and lack of atmosphere</td></tr>
+                                <tr><th>Subterranean Colonies</th><td>Networked underground settlements and mining facilities shielded from the planet's heat and radiation</td></tr>
+                                <tr><th>Key Landmarks</th><td>Dangerous regions where debris from the Vexis-2 explosion frequently falls</td></tr>
+                            </table>
+                            
+                            <h4>Flora & Fauna</h4>
+                            <table class="planet-table">
+                                <tr><th>Flora</th><td>N/A</td></tr>
+                                <tr><th>Fauna</th><td>N/A</td></tr>
+                            </table>
+                            
+                            <h4>Civilization</h4>
+                            <table class="planet-table">
+                                <tr><th>Population</th><td>Rotating workforce of miners and engineers; no permanent residents</td></tr>
+                                <tr><th>Dominant Groups</th><td>Workers under the management of Siderus Corporation</td></tr>
+                                <tr><th>Technology Level</th><td>Highly advanced subterranean life-support and mining technology</td></tr>
+                                <tr><th>Society</th><td>Workers live on a strict 2 months on, 1 month off rotation due to hazhazardous conditions. The operations are profit-driven and controlled by Siderus Corp, with little regard for worker well-being</td></tr>
+                            </table>
+                            
+                            <h4>Economy & Resources</h4>
+                            <table class="planet-table">
+                                <tr><th>Natural Resources</th><td>Vast deposits of radioactive materials essential for powering ships like the Vexis units</td></tr>
+                                <tr><th>Economic Activity</th><td>Mining operations dominate the planet's economy. Heavy reliance on freighter traffic to transport materials off-planet</td></tr>
+                            </table>
+                            
+                            <h4>Threats</h4>
+                            <table class="planet-table">
+                                <tr><th>Environmental Hazards</th><td>Extreme surface heat, high radiation levels, geological instability from volcanic activity</td></tr>
+                                <tr><th>Other Threats</th><td>Shrapnel Rain: Deadly debris falling from the Vexis-2 explosion, traveling at lethal speeds. Worker Safety: Frequent accidents and corporate negligence create additional dangers</td></tr>
+                            </table>
+                            
+                            <h4>Associated Ship: Vexis-2</h4>
+                            <table class="planet-table">
+                                <tr><th>Purpose</th><td>Initially designed to orbit TRAPPIST-1c and support mining operations</td></tr>
+                                <tr><th>Design</th><td>Smallest of the Vexis fleet, built for efficiency and speed over luxury. Focused on functionality for working-class crews</td></tr>
+                                <tr><th>Disaster</th><td>Early in Calyria-7's settlement, the Vexis-2 exploded due to an engine reactor malfunction, showering the planet with debris</td></tr>
+                                <tr><th>Impact</th><td>The settlers transitioned to permanent underground colonies, relying on external supply chains to rebuild</td></tr>
+                                <tr><th>Link</th><td><a href="https://discord.com/channels/1317616738719895602/1327126466780991550" class="planet-link" target="_blank">Thread</a></td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="card collapsed">
+                        <h3 class="planet-header" onclick="togglePlanet(this)">
+                            <span class="collapse-icon">▼</span>
+                            Draethis | TRAPPIST-1d
+                        </h3>
+                        <div class="planet-content">
+                            <p>"A vast ocean world where life thrives in the depths."</p>
+                            
+                            <h4>Planetary Overview</h4>
+                            <table class="planet-table">
+                                <tr><th>Location</th><td>TRAPPIST-1d</td></tr>
+                                <tr><th>Type</th><td>Tidally locked water world</td></tr>
+                                <tr><th>Primary Features</th><td>Endless ocean with no significant continents, only scattered archipelagos. Habitable Twilight Belt between the day side and the night side. Deep abyssal trenches, hydrothermal vent zones, and bioluminescent reefs</td></tr>
+                                <tr><th>Climate</th><td>Temperate along the Twilight Belt, with violent storms near the day side and subzero temperatures on the night side</td></tr>
+                                <tr><th>Atmosphere</th><td>Oxygen-nitrogen-rich, breathable air produced by marine photosynthetic organisms. Skies display a pale greenish-blue glow due to light scattering</td></tr>
+                            </table>
+                            
+                            <h4>Geography & Landmarks</h4>
+                            <table class="planet-table">
+                                <tr><th>Day Side</th><td>Extreme heat and constant sunlight create chaotic, stormy seas. Massive heat-driven cyclones and superheated water columns are common</td></tr>
+                                <tr><th>Night Side</th><td>A frigid, dark expanse where ice forms on the ocean's surface in shallower regions. Home to abyssal predators and ecosystems adapted to complete darkness</td></tr>
+                                <tr><th>Key Landmarks</th><td>Twilight Belt: The narrow, habitable zone with calmer waters and alien kelp jungles. Lumiflor Reefs: Bioluminescent coral forests pulsing with rhythmic light patterns. The Abyss: Deep ocean trenches where colossal, ancient creatures reside. Thermal Vents: Cradle unique ecosystems teeming with life adapted to intense heat</td></tr>
+                            </table>
+                            
+                            <h4>Flora & Fauna</h4>
+                            <table class="planet-table">
+                                <tr><th>Flora</th><td>Aerokelp: Towering kelp forests producing a gaseous compound that enriches the atmosphere. Prismal Chrysoids: Floating crystalline organisms that refract light but secrete paralyzing toxins</td></tr>
+                                <tr><th>Fauna</th><td>Aureoliths: Massive, bioluminescent leviathans feeding on plankton clouds. Kaelthorns: Kraken-like apex predators with armored tentacles. Ecliptics: Whale-sized creatures that create vortexes, sinking nearby vessels. Gargantuan Leviathans: Rare, massive sea serpents</td></tr>
+                            </table>
+                            
+                            <h4>Civilization</h4>
+                            <table class="planet-table">
+                                <tr><th>Population</th><td>Approximately 500,000 colonists in floating and submerged habitats</td></tr>
+                                <tr><th>Dominant Groups</th><td>Human colonists, divided into research factions, corporate settlers, and independent ocean harvesters</td></tr>
+                                <tr><th>Technology Level</th><td>Advanced: Floating cities, underwater bases, and oceanic resource extraction technologies</td></tr>
+                                <tr><th>Society</th><td>Highly stratified, with wealthy corporate elites controlling advanced habitats in the Twilight Belt, while laborers and independent settlers endure harsher conditions at the fringes</td></tr>
+                            </table>
+                            
+                            <h4>Economy & Resources</h4>
+                            <table class="planet-table">
+                                <tr><th>Natural Resources</th><td>Bioluminescent algae and plankton for energy and medical applications. Rare minerals found in hydrothermal vent zones. Unique toxins and organic compounds from native flora and fauna</td></tr>
+                                <tr><th>Economic Activity</th><td>Bioengineering and pharmaceutical research. Deep-sea mining and rare resource extraction. Export of alien bioluminescent compounds</td></tr>
+                            </table>
+                            
+                            <h4>Threats</h4>
+                            <table class="planet-table">
+                                <tr><th>Environmental Hazards</th><td>Massive storms near the day side and uncharted ice flows on the night side. Abyssal pressure and unpredictable seaquakes</td></tr>
+                                <tr><th>Other Threats</th><td>Hostile megafauna</td></tr>
+                            </table>
+                            
+                            <h4>Associated Ship: Vexis-3</h4>
+                            <table class="planet-table">
+                                <tr><th>Purpose</th><td>Supports colonists and research on Draethis while acting as a central trade and manufacturing hub</td></tr>
+                                <tr><th>Design</th><td>Multi-tiered, freighter-class vessel with Earth-like gravity simulation and docking bays for smaller crafts</td></tr>
+                                <tr><th>Control</th><td>TBA</td></tr>
+                                <tr><th>Living Conditions</th><td>Stratified: Wealthier residents live comfortably in the Upper Tier, while workers endure overcrowded, polluted conditions in the Lower Tier</td></tr>
+                                <tr><th>Link</th><td><a href="https://discord.com/channels/1317616738719895602/1326561320291536986" class="planet-link" target="_blank">Thread</a></td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="card collapsed">
+                        <h3 class="planet-header" onclick="togglePlanet(this)">
+                            <span class="collapse-icon">▼</span>
+                            Zephara-9 | TRAPPIST-1e
+                        </h3>
+                        <div class="planet-content">
+                            <p>"Where the peaks touch the stars, and the valleys bleed rebellion."</p>
+                            
+                            <h4>Planetary Overview</h4>
+                            <table class="planet-table">
+                                <tr><th>Location</th><td>TRAPPIST-1e</td></tr>
+                                <tr><th>Type</th><td>Mountainous world, with rugged terrain</td></tr>
+                                <tr><th>Primary Features</th><td>Mountains that stretch high into the sky, and deep winding valleys. Rocky planet, with little fertile land. Natural caves that appear to almost 'grow' crystals</td></tr>
+                                <tr><th>Climate</th><td>Low, but habitable temperatures in the valleys; freezing temperatures in the high peaks of the planet</td></tr>
+                                <tr><th>Atmosphere</th><td>Oxygen-Argon rich. Skies are a light purple</td></tr>
+                            </table>
+                            
+                            <h4>Geography & Landmarks</h4>
+                            <table class="planet-table">
+                                <tr><th>Day Side</th><td>Temperate to slightly chilly temperatures; most of the rebellions set up camp on this side of the planet</td></tr>
+                                <tr><th>Night Side</th><td>Cold to sub-zero temperatures. Sparsely populated, with small outposts and cave dwellers</td></tr>
+                                <tr><th>Key Landmarks</th><td>Fools Heights: The highest peaks on Zephara where 'The Heart of Fools' was defeated by 'The Gilded Rebellion' while fighting for control over Vexis-4. Amdora Valley: The lowest point on the planet. It has some of the only fertile land, along with a thriving animal population. Currently controlled by "Amdora's Blessing"</td></tr>
+                            </table>
+                            
+                            <h4>Flora & Fauna</h4>
+                            <table class="planet-table">
+                                <tr><th>Flora</th><td>Medismoss: Moss that grows all over Zephara; known for its medicinal properties. Dayblooms: A term used to refer to all the plants grown on the day side of the planet; made up mostly of flowers and small bushes. Nightblossoms: A term used to refer to all plants grown on the night side of the planet</td></tr>
+                                <tr><th>Fauna</th><td>Purple Gliders: Small, purple and white colored birds. Striped Hunter: Large birds of prey; known for their extra unique plumage and deadly hunting abilities. Scalers: 4 legged creatures with thick fur, and small horns. Known for their ability to quickly and efficiently travel though the rough terrain</td></tr>
+                            </table>
+                            
+                            <h4>Civilization</h4>
+                            <table class="planet-table">
+                                <tr><th>Population</th><td>Estimates range from 2-5 million</td></tr>
+                                <tr><th>Dominant Groups</th><td>"The Heart of Fools"</td></tr>
+                                <tr><th>Technology Level</th><td>Advanced: Vexis-4 specializes in scientific breakthroughs. They are also the second most advanced in weaponry, due to the war</td></tr>
+                                <tr><th>Society</th><td>Highly turbulent, due to the "Mountain Wars". Many rebellion groups are vying for power over not just Zephara, but also the Vexis-4 unit</td></tr>
+                            </table>
+                            
+                            <h4>Economy & Resources</h4>
+                            <table class="planet-table">
+                                <tr><th>Natural Resources</th><td>Many common minerals, used to mass produce weapons</td></tr>
+                                <tr><th>Economic Activity</th><td>Due to the war, the economy has been stagnant. Most live with the bare minimum, while the few on the Vexis-4 ship still unaffected, mostly trade in information / scientific research</td></tr>
+                            </table>
+                            
+                            <h4>Threats</h4>
+                            <table class="planet-table">
+                                <tr><th>Environmental Hazards</th><td>The high, rocky peaks can be unstable to climb. The 'air' on the atmosphere can be difficult to breathe for those who are not used to it</td></tr>
+                                <tr><th>Other Threats</th><td>Constant warfare between different rebellion groups</td></tr>
+                            </table>
+                            
+                            <h4>Associated Ship: Vexis-4</h4>
+                            <table class="planet-table">
+                                <tr><th>Purpose</th><td>The scientific hub of the system, keeping important research going</td></tr>
+                                <tr><th>Design</th><td>A vessel dedicated to scientific innovation. Giant labs are scattered throughout the ships, while living quarters are squeezed into the areas that could not be used as a lab or testing area</td></tr>
+                                <tr><th>Control</th><td>"The Gilded Rebellion"</td></tr>
+                                <tr><th>Living Conditions</th><td>Comfortable: Medium to large sized quarters for all members, with most of the ship's area dedicated to research labs</td></tr>
+                                <tr><th>Link</th><td><a href="https://discord.com/channels/1317616738719895602/1327525707034918922" class="planet-link" target="_blank">Thread</a></td></tr>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="card collapsed">
+                        <h3 class="planet-header" onclick="togglePlanet(this)">
+                            <span class="collapse-icon">▼</span>
+                            Ilarion | TRAPPIST-1f
+                        </h3>
+                        <div class="planet-content">
+                            <p>"A fractured world of extremes, where the wealthy soar above and the desperate toil below."</p>
+                            
+                            <h4>Planetary Overview</h4>
+                            <table class="planet-table">
+                                <tr><th>Location</th><td>TRAPPIST-1f</td></tr>
+                                <tr><th>Type</th><td>Fragmented terrestrial world with a mix of floating islands and deep impact craters</td></tr>
+                                <tr><th>Primary Features</th><td>Magnetically suspended flying islands, tethered by chains or energy fields. Vast craters from ancient asteroid impacts, home to mining colonies. Rare superconductive materials essential for interplanetary trade and starship technology</td></tr>
+                                <tr><th>Climate</th><td>Cold temperatures dominate, with frost winds during the day and plummeting cold at night. Auroras light the skies due to the planet's strong magnetic anomalies</td></tr>
+                                <tr><th>Atmosphere</th><td>Thin and cold, breathable only for short durations without oxygen masks or pressurized environments</td></tr>
+                            </table>
+                            
+                            <h4>Geography & Landmarks</h4>
+                            <table class="planet-table">
+                                <tr><th>Flying Islands</th><td>Massive floating landmasses sustained by electromagnetic anomalies and anti-gravity systems. Host luxurious palaces, research facilities, and arcologies for the elite</td></tr>
+                                <tr><th>Craters</th><td>Gigantic impact scars filled with mining colonies and geothermal farms. Home to overcrowded, freezing cities and hazardous mines</td></tr>
+                                <tr><th>Key Landmarks</th><td>Aurora Nexus: A region near the magnetic poles where the auroras are most vibrant, a sacred site for crater dwellers. Chainspire Peaks: Gigantic chains tethering the largest islands to the surface below, stretching for miles</td></tr>
+                            </table>
+                            
+                            <h4>Flora & Fauna</h4>
+                            <table class="planet-table">
+                                <tr><th>Flora</th><td>Cryoveins: Hardy, frost-resistant plants growing in crater geothermal vents, used for medicine and sustenance. Skystalks: Towering plants growing only on flying islands, their sap used in luxury products</td></tr>
+                                <tr><th>Fauna</th><td>Aethercats: Flying big cats-like predators with luminous manes, revered as symbols of power by island elites. Skywing Raptors: Giant predatory birds trained for hunting or transport. Glacierlurks: Massive, subterranean creatures that burrow through crater walls, feared by miners. Ilarion Goldfinch: Small yellow birds, with black wings</td></tr>
+                            </table>
+                            
+                            <h4>Civilization</h4>
+                            <table class="planet-table">
+                                <tr><th>Population</th><td>Estimated at 8 million, split between floating islands and crater dwellers</td></tr>
+                                <tr><th>Dominant Groups</th><td>Skyward Elite: The wealthy ruling class living on floating islands. Crater Guilds: Collectives of miners and laborers who control resource extraction</td></tr>
+                                <tr><th>Technology Level</th><td>Advanced, but highly uneven distribution. Anti-gravity systems and luxury technologies dominate island life, while craters rely on mining suits and geothermal tech for survival</td></tr>
+                                <tr><th>Society</th><td>A deeply stratified society, with a literal vertical divide: Island Life: Extravagant villas, private gardens, and indulgent leisure activities like sky races and grand galas. Crater Life: Grueling mining shifts, overcrowded cities, and subsistence on geothermal-powered hydroponics</td></tr>
+                            </table>
+                            
+                            <h4>Economy & Resources</h4>
+                            <table class="planet-table">
+                                <tr><th>Natural Resources</th><td>Rare superconductive minerals crucial for interstellar technology. Geothermal energy harnessed from deep crater vents. Exotic flora and fauna products from the flying islands</td></tr>
+                                <tr><th>Economic Activity</th><td>Mining, refining, and export of superconductive metals. Luxury goods and rare animal products traded by island elites. Geothermal energy production for local and interstellar use</td></tr>
+                            </table>
+                            
+                            <h4>Threats</h4>
+                            <table class="planet-table">
+                                <tr><th>Environmental Hazards</th><td>Extreme cold and frostbitten winds in the craters. Sudden electromagnetic storms disrupting island stability. Collapsing crater walls and unstable mines</td></tr>
+                                <tr><th>Other Threats</th><td>Predatory wildlife. Growing tensions between the islands and the craters</td></tr>
+                            </table>
+                            
+                            <h4>Associated Ship: Vexis-5</h4>
+                            <table class="planet-table">
+                                <tr><th>Purpose</th><td>An agricultural and logistics hub, specialized in food production and distribution for the TRAPPIST-1 network</td></tr>
+                                <tr><th>Design</th><td>A massive modular station with advanced hydroponic farms and docking bays for large transport ships. Its outer ring contains food processing facilities, while the inner core is dedicated to logistics and crew operations</td></tr>
+                                <tr><th>Control</th><td>TBA</td></tr>
+                                <tr><th>Living Conditions</th><td>Comfortable and efficient for crew and workers, featuring small quarters but access to communal recreation and hydroponic gardens</td></tr>
+                                <tr><th>Link</th><td><a href="https://discord.com/channels/1317616738719895602/1326896132722528318" class="planet-link" target="_blank">Thread</a></td></tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card collapsed">
+                        <h3 class="planet-header" onclick="togglePlanet(this)">
+                            <span class="collapse-icon">▼</span>
+                            Nyxar | TRAPPIST-1g
+                        </h3>
+                        <div class="planet-content">
+                            <p>"Where souls freeze and time stands still."</p>
+                            
+                            <h4>Planetary Overview</h4>
+                            <table class="planet-table">
+                                <tr><th>Location</th><td>TRAPPIST-1g</td></tr>
+                                <tr><th>Type</th><td>Prison Planet</td></tr>
+                                <tr><th>Primary Features</th><td>Jagged glaciers, icy plains, and deep crevasses</td></tr>
+                                <tr><th></th><td>Fortress-like prison complexes scattered across the surface</td></tr>
+                                <tr><th></th><td>Subterranean mining networks for extracting frozen minerals</td></tr>
+                                <tr><th></th><td>Toxic snowstorms laden with ammonia and carbon dioxide</td></tr>
+                                <tr><th>Climate</th><td>Perpetual twilight with freezing temperatures that can drop low enough to freeze an unprotected human solid in minutes</td></tr>
+                                <tr><th>Atmosphere</th><td>Thin and toxic, composed of ammonia, carbon dioxide, and trace gases. Breathable air exists only in pressurized facilities</td></tr>
+                            </table>
+                            
+                            <h4>Geography & Landmarks</h4>
+                            <table class="planet-table">
+                                <tr><th>Day Side</th><td>Perpetual dim twilight, with the faint red light of the TRAPPIST-1 star illuminating the icy terrain</td></tr>
+                                <tr><th>Night Side</th><td>Nearly indistinguishable from the day side due to the lack of significant sunlight. Bitterly cold with blinding snowstorms</td></tr>
+                                <tr><th>Key Landmarks</th><td>Fortress Complexes: Massive, heavily fortified prisons scattered across the surface</td></tr>
+                                <tr><th></th><td>Mining Zones: Subterranean tunnels and caverns where prisoners extract valuable frozen minerals</td></tr>
+                                <tr><th></th><td>Glacial Crevasses: Natural barriers and death traps dotting the terrain</td></tr>
+                            </table>
+                            
+                            <h4>Flora & Fauna</h4>
+                            <table class="planet-table">
+                                <tr><th>Flora</th><td>N/A</td></tr>
+                                <tr><th>Fauna</th><td>Cryo-Worms: Subterranean creatures adapted to extreme cold, feeding on minerals</td></tr>
+                                <tr><th></th><td>Frozen Predators: Rare, bio-engineered creatures released as deterrents for escape attempts</td></tr>
+                            </table>
+                            
+                            <h4>Civilization</h4>
+                            <table class="planet-table">
+                                <tr><th>Population</th><td>Approximately 15 million prisoners and 100,000 guards and staff</td></tr>
+                                <tr><th>Dominant Groups</th><td>Prisoners: A mix of criminals, political dissidents, and others deemed inconvenient</td></tr>
+                                <tr><th></th><td>Guards: Members of the Justice Corps, tasked with maintaining order and controlling the prison system</td></tr>
+                                <tr><th>Technology Level</th><td>Advanced, primarily focused on security, surveillance, and survival technology</td></tr>
+                                <tr><th>Society</th><td>Prisoners: Harsh social hierarchies based on strength, alliances, and resource control. Rebellion is constant but futile</td></tr>
+                                <tr><th></th><td>Guards: Live in relative luxury, indulging in comforts denied to prisoners. Often ruthless and corrupt</td></tr>
+                            </table>
+                            
+                            <h4>Economy & Resources</h4>
+                            <table class="planet-table">
+                                <tr><th>Natural Resources</th><td>Rare frozen minerals crucial for advanced energy systems</td></tr>
+                                <tr><th>Economic Activity</th><td>Mining operations staffed by prisoners, funding both the prison and broader intergalactic trade</td></tr>
+                            </table>
+                            
+                            <h4>Threats</h4>
+                            <table class="planet-table">
+                                <tr><th>Environmental Hazards</th><td>Toxic snowstorms and freezing temperatures</td></tr>
+                                <tr><th></th><td>Icy terrain riddled with crevasses and unstable glaciers</td></tr>
+                                <tr><th>Other Threats</th><td>AI-controlled energy fields and surveillance drones</td></tr>
+                                <tr><th></th><td>Brutal guards and internal prisoner violence</td></tr>
+                                <tr><th></th><td>Frozen Predators</td></tr>
+                            </table>
+                            
+                            <h4>Associated Ship: Vexis-6</h4>
+                            <table class="planet-table">
+                                <tr><th>Purpose</th><td>Serves as a judicial operations hub and transport vessel for prisoners across the TRAPPIST-1 system</td></tr>
+                                <tr><th>Design</th><td>Heavily fortified with advanced security systems, detention blocks, and judicial chambers. Equipped for interplanetary travel and long-term isolation</td></tr>
+                                <tr><th>Control</th><td>Operated by the Justice Corps, (a galactic authority tasked with law enforcement and penal management) and Prison Unit</td></tr>
+                                <tr><th>Living Conditions</th><td>Guards: Comfortable, with private quarters and recreational facilities</td></tr>
+                                <tr><th></th><td>Prisoners: Spartan, with cramped cells and minimal resources</td></tr>
+                                <tr><th>Link</th><td><a href="https://discord.com/channels/1317616738719895602/1326896278415867976" class="planet-link" target="_blank">Thread</a></td></tr>
+                            </table>
+                        </div>
+                    </div>
+
+                    <div class="card collapsed">
+                        <h3 class="planet-header" onclick="togglePlanet(this)">
+                            <span class="collapse-icon">▼</span>
+                            Solara Prime | TRAPPIST-1h
+                        </h3>
+                        <div class="planet-content">
+                            <p>"Where cold is the least of your problems."</p>
+                            
+                            <h4>Planetary Overview</h4>
+                            <table class="planet-table">
+                                <tr><th>Location</th><td>TRAPPIST-1h</td></tr>
+                                <tr><th>Type</th><td>Ice Planet with Extreme Temperatures and Hostile Terrain</td></tr>
+                                <tr><th>Primary Features</th><td>Barren frozen plains of ice and snow</td></tr>
+                                <tr><th></th><td>Jagged black rock peaks</td></tr>
+                                <tr><th></th><td>Shallow, toxic lakes formed during the short summer thaw</td></tr>
+                                <tr><th></th><td>Thick ice sheets over oceans with possible leviathans</td></tr>
+                                <tr><th></th><td>Geothermal vents scattered across the surface</td></tr>
+                                <tr><th></th><td>Hidden criminal hubs and rogue labs</td></tr>
+                                <tr><th>Climate</th><td>Summers: Slightly above freezing with toxic lakes formed. Winters: Constant froststorms, temperatures plunge to deadly lows, winds that freeze flesh instantly</td></tr>
+                                <tr><th>Atmosphere</th><td>Thin and oxygen-poor. Requires constant filtration for survival. Direct exposure to the atmosphere is fatal without a pressurized suit</td></tr>
+                            </table>
+                            
+                            <h4>Geography & Landmarks</h4>
+                            <table class="planet-table">
+                                <tr><th>Day Side</th><td>During summer, areas briefly warm to slightly above freezing. The terrain remains bleak, with icy plains and occasional geothermal heat pockets</td></tr>
+                                <tr><th>Night Side</th><td>The night is endless froststorm, with blizzards and winds, making it nearly impossible to navigate. The terrain is constantly shifting due to the freezing winds</td></tr>
+                                <tr><th>Key Landmarks</th><td>Hidden illegal hubs beneath the ice, warmed by geothermal energy</td></tr>
+                                <tr><th></th><td>Remote and isolated illegal research labs of rogue factions and corporations</td></tr>
+                                <tr><th></th><td>Geothermal oasis (rumored, possibly nonexistent)</td></tr>
+                            </table>
+                            
+                            <h4>Flora & Fauna</h4>
+                            <table class="planet-table">
+                                <tr><th>Flora</th><td>N/A</td></tr>
+                                <tr><th>Fauna</th><td>Dangerous, unconfirmed rumors of massive aquatic leviathans beneath the ice, though their existence is uncertain</td></tr>
+                                <tr><th></th><td>Other unidentified creatures have been speculated to exist, with most reports unverified</td></tr>
+                            </table>
+                            
+                            <h4>Civilization</h4>
+                            <table class="planet-table">
+                                <tr><th>Population</th><td>Very low population, made up primarily of criminals, fugitives, and desperate individuals seeking refuge. Populations consist of isolated communities with short lifespans</td></tr>
+                                <tr><th>Dominant Groups</th><td>Mobsters, smugglers and arms dealers, operating under the surface in hidden caverns</td></tr>
+                                <tr><th>Technology Level</th><td>Advanced technology is used for survival and operations. The technology of survival suits and geothermal energy usage is crucial to existence here</td></tr>
+                                <tr><th>Society</th><td>Extremely fractured and dangerous, with communities plagued by infighting and resource shortages. Dangerous networks of criminals thrive in the icy caverns, creating a lawless and volatile society</td></tr>
+                            </table>
+                            
+                            <h4>Economy & Resources</h4>
+                            <table class="planet-table">
+                                <tr><th>Natural Resources</th><td>Limited geothermal energy sources used for warmth and survival</td></tr>
+                                <tr><th></th><td>Ice sheets contain valuable frozen minerals</td></tr>
+                                <tr><th></th><td>Illegal resources like weapons, substances and illicit research materials</td></tr>
+                                <tr><th>Economic Activity</th><td>Smuggling, illegal arms dealing, and trade of restricted resources</td></tr>
+                                <tr><th></th><td>Rogue corporate research operations, often involving unethical experimentation</td></tr>
+                                <tr><th></th><td>Minimal to no commercial economy due to harsh conditions</td></tr>
+                            </table>
+                            
+                            <h4>Threats</h4>
+                            <table class="planet-table">
+                                <tr><th>Environmental Hazards</th><td>Intense froststorms capable of burying structures and vehicles</td></tr>
+                                <tr><th></th><td>Crevasses hidden under thin ice, which can swallow the unwary</td></tr>
+                                <tr><th></th><td>Perpetual cold that poses a constant risk to survival</td></tr>
+                                <tr><th></th><td>Unverified aquatic leviathans or other dangerous creatures beneath the ice</td></tr>
+                                <tr><th>Other Threats</th><td>Criminal gangs and rival factions constantly engaging in violent conflict</td></tr>
+                                <tr><th></th><td>Hostile rogue factions with dangerous secret experiments</td></tr>
+                                <tr><th></th><td>Survival itself: Limited resources, exposure, and harsh conditions</td></tr>
+                            </table>
+                            
+                            <h4>Associated Ship: Vexis-7</h4>
+                            <table class="planet-table">
+                                <tr><th>Purpose</th><td>To orbit around TRAPPIST-1h and serve as the hub for luxury and housing for high-ranking officials, primarily Siderus Corporation</td></tr>
+                                <tr><th>Design</th><td>High-tech design with luxurious interiors, capable of housing society's elite. Specifics of the ship's interior are highly classified, focusing on comfort, exclusivity, and corporate power</td></tr>
+                                <tr><th>Control</th><td>Siderus Corporation</td></tr>
+                                <tr><th>Living Conditions</th><td>Exceptionally high standard of living for the elite, with access to advanced technologies, leisure activities, and a level of comfort far beyond what is available on any other ship or planet</td></tr>
+                                <tr><th>Link</th><td><a href="https://discord.com/channels/1317616738719895602/1326896409747787797" class="planet-link" target="_blank">Thread</a></td></tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+
+            <div id="ranksApp" class="app-content">
+                <div class="app-header">
+                    <button class="back-btn" onclick="closeApp()">←</button>
+                    <div class="app-title">Hierarchy System</div>
+                </div>
+                <div class="content-area">
+                    <div class="rank-section">
+                        <h3>Justice Corp Ranks</h3>
+                        
+                        <h4>Bureau Structure</h4>
+                        <table class="planet-table">
+                            <tr><th>ID</th><th>Bureau</th></tr>
+                            <tr><td>AO</td><td>Administration Overview</td></tr>
+                            <tr><td>IA</td><td>Internal Affairs</td></tr>
+                            <tr><td>DCI</td><td>Department of Criminal Investigation</td></tr>
+                            <tr><td>NEA</td><td>Narcotics Enforcement Agency</td></tr>
+                            <tr><td>CCA</td><td>Cyber Crimes Agency</td></tr>
+                            <tr><td>HREA</td><td>Human Rights Enforcement Agency</td></tr>
+                            <tr><td>EOU</td><td>Exploitation and Obscenity Unit</td></tr>
+                        </table>
+                        
+                        <h4>Hierarchy</h4>
+                        <table class="planet-table">
+                            <tr><th>Tier</th><th>Role</th><th>Description</th></tr>
+                            <tr><td>Chief of Operations</td><td>System Command</td><td>The highest position one could achieve. In control of all of the Justice Units. More of a politician than a police officer. They are able to work on a system wide range.</td></tr>
+                            <tr><td>Bureau Chief and Deputy Chief</td><td>Bureau Leadership</td><td>Leaders of each respective bureau. The Bureau Chief takes first command, while the Deputy advises and takes second command. They are able to work on a system wide range.</td></tr>
+                            <tr><td>Captains</td><td>Precinct Command</td><td>Leaders of their respective precincts. They are required to have at least 10+ years of experience. They manage all ranks below themselves. They usually work on a ship/planet wide basis, dependent on the population.</td></tr>
+                            <tr><td>Lieutenants</td><td>Administrative Support</td><td>Assistants to captains; mainly does administrative work, with the occasional watch over of lower ranked police. They work on a ship/planet wide basis.</td></tr>
+                            <tr><td>Detectives</td><td>Investigation</td><td>Those who investigate crimes. They usually work on a citywide basis, only investigating the circumstances surrounding a crime.</td></tr>
+                            <tr><td>Officers</td><td>Field Operations</td><td>The normal everyday officer. They take shifts and routes, always on the lookout for crime. They work on a city wide basis.</td></tr>
+                            <tr><td>Recruits</td><td>Training</td><td>Newbies in the police world. They work with a higher ranked officer until they are deemed ready to work as a normal officer. They work with officers, with no jurisdiction of their own.</td></tr>
+                        </table>
+                        
+                        <p>Link: <a href="https://discord.com/channels/1317616738719895602/1331060111590035547" class="planet-link" target="_blank">Thread</a></p>
+                    </div>
+                    
+                    <div class="rank-section">
+                        <h3>Criminal Ranks</h3>
+                        
+                        <h4>Classification System</h4>
+                        <table class="planet-table">
+                            <tr><th>ID</th><th>Rank</th></tr>
+                            <tr><td>TTIC</td><td>Top-Tier Interplanetary Criminals</td></tr>
+                            <tr><td>EIC</td><td>Elite Interplanetary Criminals</td></tr>
+                            <tr><td>HDCS</td><td>Highly Dangerous Criminal Specialists</td></tr>
+                            <tr><td>LP</td><td>Local Powerhouses</td></tr>
+                            <tr><td>NCC</td><td>Notorious But Contained Criminals</td></tr>
+                            <tr><td>STTC</td><td>Small-Time Trouble Criminals</td></tr>
+                            <tr><td>LRC</td><td>Lowest Rung Criminals</td></tr>
+                        </table>
+                        
+                        <h4>Threat Levels</h4>
+                        <table class="planet-table">
+                            <tr><th>Tier</th><th>Function and Crimes</th></tr>
+                            <tr><td>Elite</td><td>The most dangerous and infamous criminals in the galaxy. Their actions can destabilize entire systems, overthrow governments, or threaten interplanetary peace. Scope: System-wide. Crimes: Large-scale war crimes, smuggling, weaponizing planetary ecosystems, interstellar terrorism, heist, raiding, kidnapping with ransoms, carnages. Examples: Apollo, Sypheron, Zeke, Spectre</td></tr>
+                            <tr><td>Apollo</td><td>Operate just below Elite but are still renowned. They tend to lead factions or specialize in unique, highly lucrative criminal endeavors. Scope: System-wide. Crimes: Advanced heists, assassinations of high-ranking officials, smuggling illegal tech, boycottage, destabilization. Examples: Silver, Renegade</td></tr>
+                            <tr><td>Sypheron</td><td>Independent operators or small groups whose actions make waves on multiple planets but don't quite affect the galactic balance. Scope: Several planets or a sector. Crimes: Targeted kidnappings, black-market trading, raiding high-profile corporate facilities.</td></tr>
+                            <tr><td>Warlord</td><td>Leaders of criminal operations within a single planetary system or planet. They are feared and influential in their domain but lack interstellar reach. Scope: Planetary or smaller sectors. Crimes: Drug empires, human trafficking rings, monopolizing underground economies.</td></tr>
+                            <tr><td>Outlaw</td><td>Solo operators or small crews who make trouble within a region or city. They have a reputation for being dangerous but aren't a widespread threat. Scope: Regional (one planet or city). Crimes: Organized robberies, illegal racing rings, minor arms dealing.</td></tr>
+                            <tr><td>Bandit</td><td>Low-level criminals who operate in groups but are generally uncoordinated and opportunistic. They often cause more annoyance than genuine threat. Scope: Local (a town or settlement). Crimes: Petty theft, hijacking small shipments, vandalism.</td></tr>
+                            <tr><td>Scavver</td><td>Desperate individuals engaging in crime for survival, often with no grand ambitions or plans. Scope: Individual or very small groups. Crimes: Pickpocketing, scavenging restricted areas, stealing food.</td></tr>
+                        </table>
+                        
+                        <p>Link: <a href="https://discord.com/channels/1317616738719895602/1330210092611665961" class="planet-link" target="_blank">Thread</a></p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="timelineApp" class="app-content">
+                <div class="app-header">
+                    <button class="back-btn" onclick="closeApp()">←</button>
+                    <div class="app-title">Galactic Timeline</div>
+                </div>
+                <div class="content-area">
+                    <table class="planet-table">
+                        <tr><th>Year</th><th>Events</th></tr>
+                        <tr><td>2074</td><td>30/09 | Elliot's Birthday</td></tr>
+                        <tr><td>2104</td><td>28/07 | Project Astrexus</td></tr>
+                        <tr><td>2194</td><td>12/01 | Levi's Birthday<br>31/05 | Mayworth's Birthday</td></tr>
+                        <tr><td>2210</td><td>17/10 | Levi enrolled for war in Zephara-9</td></tr>
+                        <tr><td>2214</td><td>11/08 | Luna's Birthday</td></tr>
+                        <tr><td>2216</td><td>20/02 | Birdie's Birthday<br>27/11 | Sypheron's Birthday</td></tr>
+                        <tr><td>2217</td><td>02/04 | Zeke's Birthday</td></tr>
+                        <tr><td>2218</td><td>20/06 | Apollo's Birthday<br>11/12 | Silver's Birthday</td></tr>
+                        <tr><td>2219</td><td>07/09 | Steve's Birthday<br>04/12 | Nico's Birthday</td></tr>
+                        <tr><td>2220</td><td>05/03 | Xero's Birthday</td></tr>
+                        <tr><td>2228</td><td>29/08 | Silver and Xero's parents death</td></tr>
+                        <tr><td>2229</td><td>21/06 | Jay's Birthday</td></tr>
+                        <tr><td>2231</td><td>21/12 | Oliver's Birthday</td></tr>
+                        <tr><td>2232</td><td>27/11 | Sypheron and Apollo get Kicked out</td></tr>
+                        <tr><td>2235</td><td>08/01 | Levi's wife was killed<br>12/01 | Apollo and Sypheron's gang is created and holds weight<br>23/03 | Sypheron's racing career starts</td></tr>
+                        <tr><td>2236</td><td>15/02 | Xero's death<br>16/03 | Mayworth and his wife divorce<br>23/07 | Sypheron was jailed<br>16/09 | Hanover threatens Zeke and he's forced to escape<br>27/10 | Silver and Luna start to bond</td></tr>
+                        <tr><td>2238</td><td>09/06 | Zeke's gang's name holds weight</td></tr>
+                        <tr><td>2239</td><td>27/07 | Silver was unjustly jailed<br>27/12 | Luna breaks Silver and Sypheron out of jail</td></tr>
+                    </table>
+                </div>
+            </div>
+
+            <div id="runwayApp" class="app-content">
+                <div class="app-header">
+                    <button class="back-btn" onclick="closeApp()">←</button>
+                    <div class="app-title">Runway</div>
+                </div>
+                <div class="content-area">
+                    <div class="card collapsed">
+                        <h3 class="planet-header" onclick="togglePlanet(this)">
+                            <span class="collapse-icon">▼</span>
+                            RUNWAY'S EXCLUSIVE: A LEGEND'S RETURN
+                        </h3>
+                        <div class="planet-content">
+                            <h4>THE RETURN OF THE CHAMPION: SYPHERON VALTROS</h4>
+                            <p><em>Interview by Alai Rae | Photos by NO.5</em></p>
+                            
+                            <p>When Sypheron disappeared, the racing world lost more than a champion. They lost a myth. The record-breaker. The showstopper. The one who hit 1,200 km/h and made it look like art. No warning, no explanation, just a sudden silence from one of the fastest racers the tracks had ever known.</p>
+                            
+                            <p>Three years and five months later, Valtros is back, piloting a ship that could turn the gods green with envy.</p>
+                            
+                            <p>We caught up with the elusive champion in a rare, sit-down interview that spanned laughs, confessions, and a few cigarette breaks.</p>
+                            
+                            <p><strong>RUNWAY:</strong> Sypheron Valtros. Champion. Ghost. Legend. You vanished. No press, no farewell tour. Where the hell did you go?</p>
+                            
+                            <p><strong>SYPHERON:</strong> Damn. Not even a "hi, how are you?" But fair. I dipped. Hard. Took some time off to deal with... family stuff. Third-grade cousin was sick—real bad. Needed someone. And hey, I'm many things, but I'm not gonna leave a kid behind.</p>
+                            
+                            <p><strong>RUNWAY:</strong> Three years and five months. That's a long time for "family stuff."</p>
+                            
+                            <p><strong>SYPHERON:</strong> Time moves weird when you're not the one holding the stopwatch. Besides, some of it was recovery time. I had a pretty nasty accident during training. Freak storm, whole cliffside gave way. I woke up with half my limbs not where I left them. Then an Aethercat decided I looked like lunch. Took the rest. ...Recovery was hell. But hell builds character, eh?</p>
+                            
+                            <p><strong>RUNWAY:</strong> Holy shit. You're lucky to be alive.</p>
+                            
+                            <p><strong>SYPHERON:</strong> I know, right? One minute I'm going 1,200 km/h, next thing I know I'm trying to out-crawl a massive beast with wings. Honestly, I screamed into a void and came out fabulous. What more do you want?</p>
+                            
+                            <p><strong>RUNWAY:</strong> And now you're back. With VANTABLACK. A ship whose name's been whispered like it's a legend. You own it now?</p>
+                            
+                            <p><strong>SYPHERON:</strong> Damn right I do. Blacker than blackout, faster than your last breakup. He's built for 1,500 km/h but I think we can crack higher. Top speed clocked at 1,507 km/h on my last test. Ain't he pretty?</p>
+                            
+                            <p><strong>RUNWAY:</strong> Give us the specs. The people are dying to know.</p>
+                            
+                            <p><strong>SYPHERON:</strong> Alright so...on top of my head... The engine is a Dual Pulse-Core HZ thrusters with ether-linked override. The exterior is a triple-coated anti-sensor mesh that can also absorb light. The custom HUD is my design. He hates losing~</p>
+                            
+                            <p><strong>RUNWAY:</strong> You've always been... different from the rest of the racers. Secretive. Flashy but private. What keeps you going?</p>
+                            
+                            <p><strong>SYPHERON:</strong> Spite. I like proving people wrong. That's it. Someone says "you can't," and I say "watch me." That mindset kept me alive, kept me fast, and sure as hell kept me dangerous.</p>
+                            
+                            <p><strong>RUNWAY:</strong> Rumors say you used to mod other ships back in the day. Some even whisper you're why Z-9 was "haunted" that year.</p>
+                            
+                            <p><strong>SYPHERON:</strong> Wrong one. People just love spooky stories. I'm just a humble racer. There's one of us that really loves to tamper with ships though. For legal reasons, cannot say who.</p>
+                            
+                            <p><strong>RUNWAY:</strong> Any hard feelings toward racers who took the spotlight while you were gone?</p>
+                            
+                            <p><strong>SYPHERON:</strong> …You mean LaBarge? Not at all. She just held my seat. Now I'm back to take it.</p>
+                            
+                            <p><strong>RUNWAY:</strong> Speaking of—you've also been spotted glaring daggers at Velázquez. History?</p>
+                            
+                            <p><strong>SYPHERON:</strong> That walking lawsuit? No comment. He knows what he did.</p>
+                            
+                            <p><strong>RUNWAY:</strong> And your biggest rival? Still LaBarge?</p>
+                            
+                            <p><strong>SYPHERON:</strong> Always has been. Always will be. Every time we're on the track together, somebody cries, somebody crashes, and the rest of the galaxy thanks us for the show~ She's fire. I'm acid. Sparks are guaranteed!</p>
+                            
+                            <p><strong>RUNWAY:</strong> You've always been private. No bodyguards. No public team. And no entourage. Why?</p>
+                            
+                            <p><strong>SYPHERON:</strong> Because I like my peace, and I like my power. The more hands on your wheel, the easier it is to crash. I trust my own grip.</p>
+                            
+                            <p><strong>RUNWAY:</strong> What's next for Valtros? More races? Fame? Trouble?</p>
+                            
+                            <p><strong>SYPHERON:</strong> Yes. Okay, seriously. I'm here to shatter expectations. To make old legends look like warm-up acts. The break was long. The comeback's going to be violent.</p>
+                            
+                            <p><strong>RUNWAY:</strong> Final question. You've crashed. You've lost limbs. You've survived it all and a damn Aethercat. What scares you now?</p>
+                            
+                            <p><strong>SYPHERON:</strong> Quitting. Giving up. Just… That's the only thing that's ever scared me. And I'm not about to start.</p>
+                            
+                            <p><strong>RUNWAY:</strong> Sypheron, you maniac. Welcome back.</p>
+                            
+                            <p><strong>SYPHERON:</strong> Pleasure's mine.</p>
+                            
+                            <p><em>Runway would like to thank Sypheron Valtros for their time, and advises all readers not to try racing, survival, or taming Aethercats at home. Unless you hate your limbs.</em></p>
+                            
+                            <p><em>Photos: NO.5 | Styling: Venair Lux | Interview: Alai Rae</em></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="charactersApp" class="app-content">
+                <div class="app-header">
+                    <button class="back-btn" onclick="closeApp()">←</button>
+                    <div class="app-title">Characters</div>
+                </div>
+                <div class="content-area">
+                    <div class="input-group">
+                        <input type="text" class="input-field" id="characterSearch" placeholder="Search characters..." oninput="filterCharacters()">
+                    </div>
+                    <div class="character-list" id="characterList">
+                        <div class="character-item" data-name="silver draemun">
+                            <div class="character-name">Silver Draemun</div>
+                            <div>Justice Corps Secretary • Aka: Aetheris Alba - EIC, Terrorist • Status: Active</div>
+                        </div>
+                        <div class="character-item" data-name="xero alba">
+                            <div class="character-name">Xero Alba</div>
+                            <div>Null • Status: Unknown</div>
+                        </div>
+                        <div class="character-item" data-name="luna arvada">
+                            <div class="character-name">Luna Arvada</div>
+                            <div>DCI Detective • Status: Active</div>
+                        </div>
+                        <div class="character-item" data-name="whittney mayworth">
+                            <div class="character-name">Whittney Mayworth</div>
+                            <div>DCI Captain • Status: Active</div>
+                        </div>
+                        <div class="character-item" data-name="leviathan maeric">
+                            <div class="character-name">Leviathan Maeric</div>
+                            <div>DCI Lieutenant • Status: Active</div>
+                        </div>
+                        <div class="character-item" data-name="sypheron valtros">
+                            <div class="character-name">Sypheron Valtros</div>
+                            <div>T-1RF Champion • Aka: Q4Z1X or Eyrix Nexure - TTIC, Terrorist, Mob leader • Status: Active</div>
+                        </div>
+                        <div class="character-item" data-name="apollo valtros">
+                            <div class="character-name">Apollo Valtros</div>
+                            <div>Fashion Icon • Aka: X9F3P - TTIC, Mob leader • Status: Active</div>
+                        </div>
+                        <div class="character-item" data-name="zeke verion">
+                            <div class="character-name">Zeke Verion</div>
+                            <div>Advanced Electronic Engineer, Energy Systems • Aka: Zeta - EIC, Weapon maker and dealer • Status: Active</div>
+                        </div>
+                        <div class="character-item" data-name="steve tharyn">
+                            <div class="character-name">Steve Tharyn</div>
+                            <div>Valtros' Bodyguard • Aka: A1B2Z • Status: Active</div>
+                        </div>
+                        <div class="character-item" data-name="nico thayne">
+                            <div class="character-name">Nico Thayne</div>
+                            <div>DCI Detective • Status: Active</div>
+                        </div>
+                        <div class="character-item" data-name="birdie labarge">
+                            <div class="character-name">Birdie LaBarge</div>
+                            <div>T-1RF Champion • Status: Active</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div id="settingsApp" class="app-content">
+                <div class="app-header">
+                    <button class="back-btn" onclick="closeApp()">←</button>
+                    <div class="app-title">System Settings</div>
+                </div>
+                <div class="content-area">
+                    <div class="card">
+                        <h3>🎨 Theme Settings</h3>
+                        <p>Choose your preferred display theme:</p>
+                        <div class="theme-selector">
+                            <div class="theme-option active" onclick="setTheme('dark')">
+                                <div class="theme-radio"></div>
+                                <div>
+                                    <strong>Dark Mode</strong><br>
+                                    <small>Space-themed dark interface</small>
+                                </div>
+                            </div>
+                            <div class="theme-option" onclick="setTheme('light')">
+                                <div class="theme-radio"></div>
+                                <div>
+                                    <strong>Light Mode</strong><br>
+                                    <small>Clean bright interface</small>
+                                </div>
+                            </div>
+                            <div class="theme-option" onclick="setTheme('high-contrast')">
+                                <div class="theme-radio"></div>
+                                <div>
+                                    <strong>High Contrast</strong><br>
+                                    <small>Maximum visibility mode</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>📡 Communications</h3>
+                        <p>Quantum Relay: Connected | Encryption: Military Grade</p>
+                    </div>
+                    <div class="card">
+                        <h3>🔐 Security</h3>
+                        <p>Bio-Lock: Enabled | Data Vault: Secured</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Generate stars
+        function generateStars() {
+            const starsContainer = document.getElementById('stars');
+            for (let i = 0; i < 100; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.width = Math.random() * 3 + 'px';
+                star.style.height = star.style.width;
+                star.style.animationDelay = Math.random() * 3 + 's';
+                starsContainer.appendChild(star);
+            }
+        }
+
+        function openApp(appName) {
+            const homeScreen = document.getElementById('homeScreen');
+            const appContent = document.getElementById(appName + 'App');
+            
+            if (appContent) {
+                homeScreen.style.display = 'none';
+                appContent.classList.add('active');
+            }
+        }
+
+        function closeApp() {
+            const homeScreen = document.getElementById('homeScreen');
+            const allApps = document.querySelectorAll('.app-content');
+            
+            allApps.forEach(app => app.classList.remove('active'));
+            homeScreen.style.display = 'flex';
+        }
+
+
+
+        function filterCharacters() {
+            const searchTerm = document.getElementById('characterSearch').value.toLowerCase();
+            const characters = document.querySelectorAll('.character-item');
+            
+            characters.forEach(character => {
+                const name = character.getAttribute('data-name');
+                if (name.includes(searchTerm)) {
+                    character.style.display = 'block';
+                } else {
+                    character.style.display = 'none';
+                }
+            });
+        }
+
+        // Theme management
+        function setTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('theme', theme);
+            
+            // Update active theme option
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            event.target.closest('.theme-option').classList.add('active');
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme') || 'dark';
+            document.body.setAttribute('data-theme', savedTheme);
+            
+            // Update active theme option
+            const themeOptions = document.querySelectorAll('.theme-option');
+            themeOptions.forEach((option, index) => {
+                option.classList.remove('active');
+                const themes = ['dark', 'light', 'high-contrast'];
+                if (themes[index] === savedTheme) {
+                    option.classList.add('active');
+                }
+            });
+        }
+
+        function login() {
+            const password = document.getElementById('password').value;
+            if (password === 'Admin') {
+                document.getElementById('loginScreen').style.display = 'none';
+                document.getElementById('mainInterface').style.display = 'block';
+            } else {
+                alert('Access Denied');
+                document.getElementById('password').value = '';
+            }
+        }
+
+        // Initialize
+        generateStars();
+        loadTheme();
+        
+        document.getElementById('password').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') login();
+        });
+
+        // Update time and galactic date
+        function updateTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { 
+                hour: '2-digit', 
+                minute: '2-digit',
+                hour12: false 
+            });
+            document.querySelector('.time').textContent = timeStr;
+            
+            // Update galactic date (current date/month + 214 years)
+            const galacticYear = now.getFullYear() + 214;
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const galacticDate = `${galacticYear}.${month}.${day}`;
+            document.getElementById('galacticTime').textContent = `Galactic Standard Time: ${galacticDate}`;
+        }
+
+        // Planet collapsible functionality
+        function togglePlanet(header) {
+            const card = header.closest('.card');
+            card.classList.toggle('collapsed');
+        }
+
+        updateTime();
+        setInterval(updateTime, 1000);
+    </script>
+</body>
+</html>
