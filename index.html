@@ -693,11 +693,14 @@
                 overflow: auto;
                 align-items: flex-start;
                 padding: 5px;
+                min-height: 100vh;
+                min-height: 100svh;
             }
             .tablet-container {
                 width: 98vw;
                 height: auto;
-                min-height: 85vh;
+                min-height: calc(100vh - 120px);
+                min-height: calc(100svh - 60px);
                 max-height: none;
             }
             .app-grid {
