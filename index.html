@@ -57,13 +57,7 @@
             overflow: hidden;
         }
 
-        @media (max-height: 700px) {
-            body {
-                overflow: auto;
-                align-items: flex-start;
-                padding: 10px 0;
-            }
-        }
+
 
         .stars {
             position: fixed;
@@ -689,12 +683,16 @@
         }
 
         @media (max-width: 600px) {
-            body {
+            html, body {
                 overflow: hidden;
-                align-items: stretch;
-                padding: 0;
                 height: 100vh;
                 height: 100svh;
+                position: fixed;
+                width: 100%;
+            }
+            body {
+                align-items: stretch;
+                padding: 0;
             }
             .tablet-container {
                 width: 100vw;
