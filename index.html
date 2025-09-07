@@ -689,9 +689,16 @@
         }
 
         @media (max-width: 600px) {
+            body {
+                overflow: auto;
+                align-items: flex-start;
+                padding: 5px;
+            }
             .tablet-container {
                 width: 98vw;
-                height: 95vh;
+                height: auto;
+                min-height: 85vh;
+                max-height: none;
             }
             .app-grid {
                 grid-template-columns: repeat(3, 1fr);
@@ -701,13 +708,6 @@
                 width: 60px;
                 height: 60px;
                 font-size: 1.8rem;
-            }
-        }
-
-        @media (max-height: 700px) {
-            .tablet-container {
-                height: auto;
-                min-height: 600px;
             }
         }
 
