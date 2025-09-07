@@ -690,18 +690,18 @@
 
         @media (max-width: 600px) {
             body {
-                overflow: auto;
-                align-items: flex-start;
-                padding: 5px;
-                min-height: 100vh;
-                min-height: 100svh;
+                overflow: hidden;
+                align-items: stretch;
+                padding: 0;
+                height: 100vh;
+                height: 100svh;
             }
             .tablet-container {
-                width: 98vw;
-                height: auto;
-                min-height: calc(100vh - 120px);
-                min-height: calc(100svh - 60px);
-                max-height: none;
+                width: 100vw;
+                height: 100vh;
+                height: 100svh;
+                border-radius: 0;
+                padding: 10px;
             }
             .app-grid {
                 grid-template-columns: repeat(3, 1fr);
