@@ -57,6 +57,14 @@
             overflow: hidden;
         }
 
+        @media (max-height: 700px) {
+            body {
+                overflow: auto;
+                align-items: flex-start;
+                padding: 10px 0;
+            }
+        }
+
         .stars {
             position: fixed;
             top: 0;
@@ -672,7 +680,6 @@
             .tablet-container {
                 width: 95vw;
                 height: 90vh;
-                max-height: calc(100vh - 20px);
                 border-radius: 20px;
             }
             .app-grid {
@@ -685,8 +692,6 @@
             .tablet-container {
                 width: 98vw;
                 height: 95vh;
-                max-height: calc(100vh - 10px);
-                min-height: 500px;
             }
             .app-grid {
                 grid-template-columns: repeat(3, 1fr);
@@ -696,6 +701,13 @@
                 width: 60px;
                 height: 60px;
                 font-size: 1.8rem;
+            }
+        }
+
+        @media (max-height: 700px) {
+            .tablet-container {
+                height: auto;
+                min-height: 600px;
             }
         }
 
