@@ -1800,7 +1800,6 @@
     </div>
 
     <script>
-        // Generate stars
         function generateStars() {
             const starsContainer = document.getElementById('stars');
             for (let i = 0; i < 100; i++) {
@@ -1863,12 +1862,11 @@
             });
         }
 
-        // Theme management
+    
         function setTheme(theme) {
             document.body.setAttribute('data-theme', theme);
             localStorage.setItem('theme', theme);
             
-            // Update active theme option
             document.querySelectorAll('.theme-option').forEach(option => {
                 option.classList.remove('active');
             });
@@ -1901,7 +1899,6 @@
             }
         }
 
-        // Initialize
         generateStars();
         loadTheme();
         
@@ -1909,7 +1906,6 @@
             if (e.key === 'Enter') login();
         });
 
-        // Update time, galactic date and battery
         function updateTime() {
             const now = new Date();
             const timeStr = now.toLocaleTimeString('en-US', { 
@@ -1919,14 +1915,14 @@
             });
             document.querySelector('.time').textContent = timeStr;
             
-            // Update galactic date (current date/month + 214 years)
+           
             const galacticYear = now.getFullYear() + 214;
             const month = String(now.getMonth() + 1).padStart(2, '0');
             const day = String(now.getDate()).padStart(2, '0');
             const galacticDate = `${galacticYear}.${month}.${day}`;
             document.getElementById('galacticTime').textContent = `Galactic Standard Time: ${galacticDate}`;
             
-            // Update battery level
+           
             if ('getBattery' in navigator) {
                 navigator.getBattery().then(battery => {
                     const batteryLevel = Math.round(battery.level * 100);
@@ -1938,7 +1934,7 @@
             }
         }
 
-        // Planet collapsible functionality
+        
         function togglePlanet(header) {
             const card = header.closest('.card');
             card.classList.toggle('collapsed');
@@ -1950,5 +1946,6 @@
 </body>
 
 </html>
+
 
 
