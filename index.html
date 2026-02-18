@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Synchro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="loginScreen" class="login-screen">
+        <div class="login-box">
+            <h2>SYNCHRO OS</h2>
+            <div class="login-form">
+                <div class="input-group">
+                    <label>Username:</label>
+                    <input type="text" value="Admin" readonly>
+                </div>
+                <div class="input-group">
+                    <label>Password:</label>
+                    <input type="password" id="password" placeholder="Enter password">
+                </div>
+                <button onclick="login()">LOGIN</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="stars" id="stars"></div>
+    
+    <div class="tablet-container" id="mainInterface" style="display: none;">
+        <div class="screen">
+            <div class="wallpaper"></div>
+            
+            <div class="status-bar"></div>
+
+            <div class="home-screen" id="homeScreen"></div>
+
+            <div id="loreApp" class="app-content"></div>
+            <div id="planetsApp" class="app-content"></div>
+            <div id="ranksApp" class="app-content"></div>
+            <div id="timelineApp" class="app-content"></div>
+            <div id="runwayApp" class="app-content"></div>
+            <div id="storypostsApp" class="app-content"></div>
+            <div id="charactersApp" class="app-content"></div>
+            <div id="settingsApp" class="app-content"></div>
+        </div>
+    </div>
+    <script type="module" src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+export const timelineData = [
+    { year: "2074", events: ["30/09 | Elliot's Birthday"] },
+    { year: "2104", events: ["28/07 | Project Astrexus"] },
+    { year: "2194", events: ["12/01 | Levi's Birthday", "31/05 | Mayworth's Birthday"] },
+    { year: "2210", events: ["17/10 | Levi enrolled for war in Zephara-9"] },
+    { year: "2214", events: ["11/08 | Luna's Birthday"] },
+    { year: "2216", events: ["20/02 | Birdie's Birthday", "27/11 | Sypheron's Birthday"] },
+    { year: "2217", events: ["02/04 | Zeke's Birthday"] },
+    { year: "2218", events: ["20/06 | Apollo's Birthday", "11/12 | Silver's Birthday"] },
+    { year: "2219", events: ["07/09 | Steve's Birthday", "04/12 | Nico's Birthday"] },
+    { year: "2220", events: ["05/03 | Xero's Birthday"] },
+    { year: "2228", events: ["29/08 | Silver and Xero's parents death"] },
+    { year: "2229", events: ["21/06 | Jay's Birthday"] },
+    { year: "2231", events: ["21/12 | Oliver's Birthday"] },
+    { year: "2232", events: ["27/11 | Sypheron and Apollo get Kicked out"] },
+    { year: "2235", events: ["08/01 | Levi's wife was killed", "12/01 | Apollo and Sypheron's gang is created and holds weight", "23/03 | Sypheron's racing career starts"] },
+    { year: "2236", events: ["15/02 | Xero's death", "16/03 | Mayworth and his wife divorce", "23/07 | Sypheron was jailed", "16/09 | Hanover threatens Zeke and he's forced to escape", "27/10 | Silver and Luna start to bond"] },
+    { year: "2238", events: ["09/06 | Zeke's gang's name holds weight"] },
+    { year: "2239", events: ["27/07 | Silver was unjustly jailed", "27/12 | Luna breaks Silver and Sypheron out of jail"] }
+];
