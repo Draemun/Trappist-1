@@ -29,24 +29,29 @@ function generateStars() {
             
             allApps.forEach(app => app.classList.remove('active'));
             homeScreen.style.display = 'flex';
-            window.location.hash = '';
+            window.location.hash = 'home';
         }
 
         window.addEventListener('hashchange', () => {
             const hash = window.location.hash.slice(1);
-            if (hash) {
+            if (hash && hash !== 'home') {
                 const appContent = document.getElementById(hash + 'App');
                 if (appContent && !appContent.classList.contains('active')) {
                     openApp(hash);
                 }
             } else {
-                closeApp();
+                const homeScreen = document.getElementById('homeScreen');
+                const allApps = document.querySelectorAll('.app-content');
+                allApps.forEach(app => app.classList.remove('active'));
+                homeScreen.style.display = 'flex';
             }
         });
 
-        if (window.location.hash) {
+        if (window.location.hash && window.location.hash !== '#home') {
             const hash = window.location.hash.slice(1);
             setTimeout(() => openApp(hash), 100);
+        } else {
+            window.location.hash = 'home';
         }
         function filterStoryposts() {
             const searchTerm = document.getElementById('storypostSearch').value.toLowerCase();
