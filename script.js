@@ -20,6 +20,7 @@ function generateStars() {
             if (appContent) {
                 homeScreen.style.display = 'none';
                 appContent.classList.add('active');
+                window.location.hash = appName;
             }
         }
         function closeApp() {
@@ -28,6 +29,24 @@ function generateStars() {
             
             allApps.forEach(app => app.classList.remove('active'));
             homeScreen.style.display = 'flex';
+            window.location.hash = '';
+        }
+
+        window.addEventListener('hashchange', () => {
+            const hash = window.location.hash.slice(1);
+            if (hash) {
+                const appContent = document.getElementById(hash + 'App');
+                if (appContent && !appContent.classList.contains('active')) {
+                    openApp(hash);
+                }
+            } else {
+                closeApp();
+            }
+        });
+
+        if (window.location.hash) {
+            const hash = window.location.hash.slice(1);
+            setTimeout(() => openApp(hash), 100);
         }
         function filterStoryposts() {
             const searchTerm = document.getElementById('storypostSearch').value.toLowerCase();
@@ -92,16 +111,8 @@ function generateStars() {
             }
         }
 
-        generateStars();
-        loadTheme();
-        
-        document.addEventListener('DOMContentLoaded', () => {
-            const passwordInput = document.getElementById('password');
-            if (passwordInput) {
-                passwordInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') login();
-                });
-            }
+        document.getElementById('password')?.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') login();
         });
 
         function updateTime() {
@@ -145,3 +156,6 @@ function generateStars() {
         window.setTheme = setTheme;
         window.login = login;
         window.togglePlanet = togglePlanet;
+
+        generateStars();
+        loadTheme();
